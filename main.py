@@ -1,24 +1,28 @@
 from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
 posts = [
     {
         "id": 1, 
+        "author": "John Cena",
         "title": "First Post", 
-        "content": "This is the content of the first post."
+        "content": "You can't see me."
     },
-    {"id": 2, "title": "Second Post", "content": "This is the content of the second post."},
-    {"id": 3, "title": "Third Post", "content": "This is the content of the third post."}
+    {"id": 2, "author": "Randy Orton", "title": "Second Post", "content": "Watch out! RKO out of nowhere!"},
+    {"id": 3, "author": "Dwayne Johnson", "title": "Third Post", "content": "The Rock."}
 ]
 
-@app.get("/", include_in_schema=False)
-@app.get("/posts", include_in_schema=False)
-def read_root(request: Request):
-    return templates.TemplateResponse(request, "home.html", {"posts": posts, "title": "Home Page"})
+@app.get("/", include_in_schema=False, name="home")
+@app.get("/posts", include_in_schema=False, name="posts")
+def home(request: Request):
+    return templates.TemplateResponse(request, "home.html", {"posts": posts, "title": "Home"})
 
 @app.get("/api/posts")
 def get_posts():
