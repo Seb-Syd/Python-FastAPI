@@ -17,10 +17,11 @@ posts = [
         "id": 1, 
         "author": "John Cena",
         "title": "First Post", 
-        "content": "You can't see me."
+        "content": "You can't see me.",
+        "date_posted": "3rd of November, 2026"
     },
-    {"id": 2, "author": "Randy Orton", "title": "Second Post", "content": "Watch out! RKO out of nowhere!"},
-    {"id": 3, "author": "Dwayne Johnson", "title": "Third Post", "content": "The Rock."}
+    {"id": 2, "author": "Randy Orton", "title": "Second Post", "content": "Watch out! RKO out of nowhere!", "date_posted": "3rd of November, 2026"},
+    {"id": 3, "author": "Dwayne Johnson", "title": "Third Post", "content": "The Rock.", "date_posted": "3rd of November, 2026"}
 ]
 
 @app.get("/", include_in_schema=False, name="home")
@@ -48,6 +49,26 @@ def post_page(request: Request, post_id:int):
 @app.get("/api/posts", response_model=list[PostResponse])
 def get_posts():
     return posts
+
+
+## Create Post
+@app.post(
+    "/api/posts",
+    response_model=PostResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_post(post: PostCreate):
+    new_id = max(p["id"] for p in posts) + 1 if posts else 1
+    new_post = {
+        "id": new_id,
+        "author": post.author,
+        "title": post.title,
+        "content": post.content,
+        "date_posted": "3rd of November, 2026",
+    }
+    posts.append(new_post)
+    return new_post
+
 
 @app.get("/api/posts/{post_id}", response_model=PostResponse)
 def get_posts(post_id:int):
